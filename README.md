@@ -23,12 +23,12 @@ graph LR
     B --> C[Apache Kafka :9092]
     C --> D[Consumer API :8082]
     C --> E[Kafka Streams]
-    E --> F[Estado Agregado (KTable)]
+    E --> F[Estado Agregado - KTable]
     D --> G[SSE Stream / Dashboard]
     C --> H[AKHQ UI :8085]
     B --> I[Schema Registry :8081]
     D --> I
-````
+```
 
 ---
 
