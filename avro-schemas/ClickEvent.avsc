@@ -1,0 +1,14 @@
+{
+  "type": "record",
+  "name": "ClickEvent",
+  "namespace": "com.example.avro",
+  "fields": [
+    {"name": "userId", "type": "string"},
+    {"name": "page", "type": "string"},
+    {"name": "elementId", "type": ["null", "string"], "default": null},
+    {"name": "timestamp", "type": "long", "logicalType": "timestamp-millis"},
+    {"name": "sessionId", "type": "string"},
+    {"name": "userAgent", "type": ["null", "string"], "default": null},
+    {"name": "ipAddress", "type": ["null", "string"], "default": null}
+  ]
+}

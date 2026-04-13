@@ -1,0 +1,7 @@
+com\example\consumer\config\KafkaStreamsConfig.class
+com\example\consumer\service\ClickAggregatorService$ClickStats.class
+com\example\avro\ClickEvent$Builder.class
+com\example\avro\ClickEvent.class
+com\example\consumer\controller\StatsController.class
+com\example\consumer\config\KafkaConsumerConfig.class
+com\example\consumer\service\ClickAggregatorService.class

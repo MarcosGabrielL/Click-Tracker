@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry excluding="controller/|service/|config/" kind="src" path="click-consumer/src/main/java/com/example/consumer"/>
+	<classpathentry kind="src" path="click-consumer/src/main/java/com/example/consumer/config"/>
+	<classpathentry kind="src" path="click-consumer/src/main/java/com/example/consumer/controller"/>
+	<classpathentry kind="src" path="click-consumer/src/main/java/com/example/consumer/service"/>
+	<classpathentry excluding="config/|service/|controller/" kind="src" path="click-producer/src/main/java/com/example/producer"/>
+	<classpathentry kind="src" path="click-producer/src/main/java/com/example/producer/config"/>
+	<classpathentry kind="src" path="click-producer/src/main/java/com/example/producer/controller"/>
+	<classpathentry kind="src" path="click-producer/src/main/java/com/example/producer/service"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

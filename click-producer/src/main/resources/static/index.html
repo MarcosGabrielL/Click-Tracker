@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Click Tracker Demo</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        .button { 
+            padding: 15px 30px; 
+            margin: 10px; 
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #stats { 
+            margin-top: 30px; 
+            padding: 20px; 
+            background: #f5f5f5;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Click Tracker Demo</h1>
+    
+    <input type="text" id="userId" placeholder="User ID" value="user123">
+    
+    <div>
+        <button class="button" data-element="button1">Botão 1</button>
+        <button class="button" data-element="button2">Botão 2</button>
+        <button class="button" data-element="link1">Link 1</button>
+        <button class="button" data-element="image1">Imagem 1</button>
+    </div>
+    
+    <div id="stats">
+        <h3>Estatísticas em Tempo Real:</h3>
+        <pre id="statsContent">Aguardando atualizações...</pre>
+    </div>
+    
+    <script>
+        const userId = document.getElementById('userId').value;
+        const sessionId = 'session_' + Date.now();
+        let eventSource;
+        
+        // Rastrear cliques
+        document.querySelectorAll('.button').forEach(button => {
+            button.addEventListener('click', async (e) => {
+                const elementId = e.target.dataset.element;
+                
+                try {
+                    const response = await fetch('http://localhost:8081/api/clicks', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            userId: userId,
+                            page: window.location.pathname,
+                            elementId: elementId,
+                            sessionId: sessionId
+                        })
+                    });
+                    
+                    console.log('Click tracked:', await response.text());
+                } catch (error) {
+                    console.error('Error tracking click:', error);
+                }
+            });
+        });
+        
+        // Conectar ao stream de estatísticas
+        function connectToStats() {
+            eventSource = new EventSource('http://localhost:8082/api/stats/stream');
+            
+            eventSource.onmessage = (event) => {
+                const stats = JSON.parse(event.data);
+                document.getElementById('statsContent').textContent = 
+                    JSON.stringify(stats, null, 2);
+            };
+            
+            eventSource.onerror = (error) => {
+                console.error('EventSource failed:', error);
+                setTimeout(connectToStats, 5000);
+            };
+        }
+        
+        connectToStats();
+    </script>
+</body>
+</html>
