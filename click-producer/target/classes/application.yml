@@ -1,32 +1,22 @@
 spring:
   application:
     name: click-producer
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+      properties:
+        schema.registry.url: http://localhost:8081
+        enable.idempotence: true
+        max.in.flight.requests.per.connection: 1
+        retries: 2147483647
+        acks: all
 
 server:
-  port: 8081
-
-kafka:
-  bootstrap-servers: localhost:9092
-  producer:
-    key-serializer: org.apache.kafka.common.serialization.StringSerializer
-    value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
-    properties:
-      schema:
-        registry:
-          url: http://localhost:8081
-      enable:
-        idempotence: true
-      max:
-        in:
-          flight:
-            requests:
-              per:
-                connection: 1
-      retries: 2147483647
-      acks: all
+  port: 8082
 
 logging:
   level:
     com.example.producer: DEBUG
     org.springframework.kafka: INFO
-    org.apache.kafka: WARN

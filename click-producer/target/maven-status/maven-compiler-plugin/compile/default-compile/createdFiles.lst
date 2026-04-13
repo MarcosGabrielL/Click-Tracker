@@ -1,3 +1,4 @@
+com\example\producer\ClickProducerApplication.class
 com\example\producer\service\ClickEventProducer.class
 com\example\producer\controller\ClickController.class
 com\example\avro\ClickEvent$Builder.class

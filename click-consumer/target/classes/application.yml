@@ -1,27 +1,27 @@
 spring:
   application:
     name: click-consumer
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: click-aggregator
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+      auto-offset-reset: earliest
+      properties:
+        schema.registry.url: http://localhost:8081
+        specific.avro.reader: true
+    streams:
+      properties:
+        default.key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+        default.value.serde: io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde
+        schema.registry.url: http://localhost:8081
 
 server:
-  port: 8082
-
-kafka:
-  bootstrap-servers: localhost:9092
-  consumer:
-    group-id: click-aggregator
-    key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-    value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
-    auto-offset-reset: earliest
-    properties:
-      schema:
-        registry:
-          url: http://localhost:8081
-      specific:
-        avro:
-          reader: true
+  port: 8083
 
 logging:
   level:
     com.example.consumer: DEBUG
     org.springframework.kafka: INFO
-    org.apache.kafka: WARN
+    org.apache.kafka.streams: INFO

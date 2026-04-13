@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Click Tracker Demo</title>
+    <meta charset="UTF-8">
     <style>
         body { font-family: Arial; padding: 20px; }
         .button { 
@@ -9,6 +10,13 @@
             margin: 10px; 
             font-size: 16px;
             cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        .button:hover {
+            background-color: #45a049;
         }
         #stats { 
             margin-top: 30px; 
@@ -16,68 +24,119 @@
             background: #f5f5f5;
             border-radius: 5px;
         }
+        #status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
     </style>
 </head>
 <body>
     <h1>Click Tracker Demo</h1>
     
-    <input type="text" id="userId" placeholder="User ID" value="user123">
+    <div>
+        <label for="userId">User ID:</label>
+        <input type="text" id="userId" placeholder="User ID" value="user123" style="padding: 5px; margin: 10px 0;">
+    </div>
     
     <div>
-        <button class="button" data-element="button1">Botão 1</button>
-        <button class="button" data-element="button2">Botão 2</button>
+        <button class="button" data-element="button1">Botao 1</button>
+        <button class="button" data-element="button2">Botao 2</button>
         <button class="button" data-element="link1">Link 1</button>
         <button class="button" data-element="image1">Imagem 1</button>
     </div>
     
+    <div id="status"></div>
+    
     <div id="stats">
-        <h3>Estatísticas em Tempo Real:</h3>
-        <pre id="statsContent">Aguardando atualizações...</pre>
+        <h3>Estatisticas em Tempo Real:</h3>
+        <pre id="statsContent">Aguardando atualizacoes...</pre>
     </div>
     
     <script>
-        const userId = document.getElementById('userId').value;
         const sessionId = 'session_' + Date.now();
         let eventSource;
+        
+        // Funcao para mostrar status
+        function showStatus(message, isError) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = isError ? 'error' : 'success';
+            setTimeout(() => statusDiv.textContent = '', 3000);
+        }
         
         // Rastrear cliques
         document.querySelectorAll('.button').forEach(button => {
             button.addEventListener('click', async (e) => {
                 const elementId = e.target.dataset.element;
+                const currentUserId = document.getElementById('userId').value;
+                
+                const clickData = {
+                    userId: currentUserId,
+                    page: window.location.pathname,
+                    elementId: elementId,
+                    sessionId: sessionId
+                };
+                
+                console.log('Enviando clique:', clickData);
                 
                 try {
-                    const response = await fetch('http://localhost:8081/api/clicks', {
+                    const response = await fetch('/api/clicks', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({
-                            userId: userId,
-                            page: window.location.pathname,
-                            elementId: elementId,
-                            sessionId: sessionId
-                        })
+                        body: JSON.stringify(clickData)
                     });
                     
-                    console.log('Click tracked:', await response.text());
+                    if (response.ok) {
+                        const text = await response.text();
+                        console.log('Click tracked:', text);
+                        showStatus('Clique registrado com sucesso!', false);
+                    } else {
+                        throw new Error('Erro na resposta: ' + response.status);
+                    }
                 } catch (error) {
                     console.error('Error tracking click:', error);
+                    showStatus('Erro ao registrar clique: ' + error.message, true);
                 }
             });
         });
         
-        // Conectar ao stream de estatísticas
+        // Conectar ao stream de estatisticas
         function connectToStats() {
-            eventSource = new EventSource('http://localhost:8082/api/stats/stream');
+            if (eventSource) {
+                eventSource.close();
+            }
+            
+            console.log('Conectando ao stream de estatisticas...');
+            eventSource = new EventSource('http://localhost:8083/api/stats/stream');
+            
+            eventSource.onopen = () => {
+                console.log('Conexao SSE estabelecida');
+            };
             
             eventSource.onmessage = (event) => {
-                const stats = JSON.parse(event.data);
-                document.getElementById('statsContent').textContent = 
-                    JSON.stringify(stats, null, 2);
+                try {
+                    const stats = JSON.parse(event.data);
+                    document.getElementById('statsContent').textContent = 
+                        JSON.stringify(stats, null, 2);
+                } catch (e) {
+                    console.error('Erro ao parsear stats:', e);
+                }
             };
             
             eventSource.onerror = (error) => {
                 console.error('EventSource failed:', error);
+                eventSource.close();
                 setTimeout(connectToStats, 5000);
             };
         }
